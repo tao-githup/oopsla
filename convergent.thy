@@ -29,7 +29,8 @@ lemma convergent_aux:" ∀e>0. ∃M. ∀n≥M. ∀m≥n. (dist  ((A m)::real)  (
                    ⟹∀e>0. ∃M. ∀n≥M. ∀m≥n. dist (A m) (A n) < e"
        apply(auto)
        apply(drule_tac x="e*e" in spec,auto)
-       by (smt mult_mono)
+       apply(rule_tac x="M" in exI)
+       by (metis (full_types) less_eq_real_def mult_le_less_imp_less not_less)
 lemma convergent_aux5:" 0 ≤ foldseq_transposed op + (λka. (Rep_matrix (A m) 0 ka - Rep_matrix (A n) 0 ka) * (Rep_matrix (A m) 0 ka - Rep_matrix (A n) 0 ka))
           N"
           apply(induct N,auto)
@@ -103,6 +104,46 @@ lemma convergent_aux9:" i < N ⟹ j < N ⟹
      apply(simp add:mat_sub_def)
      apply(simp add:diff_matrix_def)
      done
+lemma convergent_aux9_1:" i < N ⟹ j < N ⟹
+    (Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+    ≤ foldseq op + (λk. foldseq op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) N"
+     apply (simp add: associative_def foldseq_assoc)
+     apply(subgoal_tac "(Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+    ≤ foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) i")
+     apply(subgoal_tac "( foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) i)≤
+         foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) N")
+     prefer 2
+     apply(rule foldseq_aux1,auto)
+     using aux5 apply auto[1]
+     apply(subgoal_tac "  foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) N
+          ≤ foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) i")
+     prefer 2
+     apply(rule foldseq_aux2,auto)
+     using aux5 apply auto[1]
+     apply(subgoal_tac "(Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+            ≤ foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) N")
+     apply auto
+     apply(subgoal_tac " foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) j≤
+        foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) N")
+     prefer 2
+     apply(rule foldseq_aux1,auto)
+     apply(subgoal_tac" (Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+    ≤ foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) j")
+     apply auto
+     apply(subgoal_tac " Rep_matrix (mat_sub (A m) (A n)) i j * Rep_matrix (mat_sub (A m) (A n)) i j  ≤
+       foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) j ")
+     prefer 2
+      apply(rule foldseq_aux2,auto)
+     apply(subgoal_tac "(Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j) =
+        Rep_matrix (mat_sub (A m) (A n)) i j * Rep_matrix (mat_sub (A m) (A n)) i j",auto)
+     apply(simp add:mat_sub_def)
+     apply(simp add:diff_matrix_def)
+     done
+     
 lemma convergent_aux3:" (Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
     ≤ foldseq op + (λk. foldseq op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) infinite)
         infinite"
@@ -162,6 +203,45 @@ lemma convergent_aux1:" ∀e>0. ∃M. ∀n≥M. ∀m≥n. all_sum_pow (mat_sub (
      apply auto
      apply(simp add:convergent_aux2)
      done
+lemma convergent_aux15:" i < N ⟹ j < N ⟹
+    (Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+    ≤ foldseq op + (λk. foldseq op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) N"
+     apply (simp add: associative_def foldseq_assoc)
+     apply(subgoal_tac "(Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+    ≤ foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) i")
+     apply(subgoal_tac "( foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) i)≤
+         foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) N")
+     prefer 2
+     apply(rule foldseq_aux1,auto)
+     using aux5 apply auto[1]
+     apply(subgoal_tac "  foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) N
+          ≤ foldseq_transposed op +
+        (λk. foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) k ka * Rep_matrix (mat_sub (A m) (A n)) k ka) N) i")
+     prefer 2
+     apply(rule foldseq_aux2,auto)
+     using aux5 apply auto[1]
+     apply(subgoal_tac "(Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+            ≤ foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) N")
+     apply auto
+     apply(subgoal_tac " foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) j≤
+        foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) N")
+     prefer 2
+     apply(rule foldseq_aux1,auto)
+     apply(subgoal_tac" (Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j)
+    ≤ foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) j")
+     apply auto
+     apply(subgoal_tac " Rep_matrix (mat_sub (A m) (A n)) i j * Rep_matrix (mat_sub (A m) (A n)) i j  ≤
+       foldseq_transposed op + (λka. Rep_matrix (mat_sub (A m) (A n)) i ka * Rep_matrix (mat_sub (A m) (A n)) i ka) j ")
+     prefer 2
+      apply(rule foldseq_aux2,auto)
+     apply(subgoal_tac "(Rep_matrix (A m) i j - Rep_matrix (A n) i j) * (Rep_matrix (A m) i j - Rep_matrix (A n) i j) =
+        Rep_matrix (mat_sub (A m) (A n)) i j * Rep_matrix (mat_sub (A m) (A n)) i j",auto)
+     apply(simp add:mat_sub_def)
+     apply(simp add:diff_matrix_def)
+     done
 lemma fuck1:" ∀n. less (A n) (A (Suc n)) ⟹ Matrix.less (A m) (A (m + (a::nat)))"
 apply (induct a,auto)
 apply (simp add: less11)
@@ -180,6 +260,8 @@ lemma convergent_aux11:"∀n m. n≥m⟶less ((A::nat⇒matrix) m) (A n) ⟹∀e
               Tr (mat_sub (A m) (A n)) * Tr (mat_sub (A m) (A n))",auto)
             apply(rule advance)
             by (simp add: less_def)
+lemma convergent_aux12_aux:"a≥0⟹a<sqrt e⟹a*a<e"
+         using real_sqrt_less_iff by fastforce
 lemma convergent_aux12:"∀n m. n≥m⟶less ((A::nat⇒matrix) m) (A n) ⟹ ∀eaa>0. ∃M. ∀n≥M. ∀m≥n. Tr (mat_sub (A m) (A n)) < eaa⟹
                      ∀eaa>0. ∃M. ∀n≥M. ∀m≥n. Tr (mat_sub (A m) (A n)) * Tr (mat_sub (A m) (A n)) < eaa"
           apply auto
@@ -188,7 +270,8 @@ lemma convergent_aux12:"∀n m. n≥m⟶less ((A::nat⇒matrix) m) (A n) ⟹ ∀
           apply(drule_tac x="n" in spec,auto)
           apply(drule_tac x="m" in spec,auto)
           apply(subgoal_tac "Tr (mat_sub (A m) (A n)) ≥0")
-          apply (smt real_sqrt_abs2 real_sqrt_le_mono)
+          apply(rule convergent_aux12_aux)
+          apply auto
           by (simp add: less_def positive_Tr)
 
 lemma convergent:"  ∀n. positive (A n) ⟹ ∃B.∀n. Tr (A n) ≤B ⟹ ∀n. less (A n) (A (Suc n))
