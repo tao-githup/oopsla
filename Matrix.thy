@@ -435,7 +435,25 @@ using dual_order.trans nrows by force
 have d:"f 0 0=0⟹∀a≥infinite.∀b.(combine_infmatrix f (Rep_matrix A) (Rep_matrix B)) b a=0"
 using dual_order.trans ncols by force
 have e:" f 0 0 = 0 ⟹(fst ` nonzero_positions (combine_infmatrix f (Rep_matrix A) (Rep_matrix B)))≠{}⟹  Max (fst ` nonzero_positions (combine_infmatrix f (Rep_matrix A) (Rep_matrix B))) < infinite"
-by (smt Collect_cong a c e nonzero_positions_def not_less split_beta')
+proof -
+  assume a1: "fst ` nonzero_positions (combine_infmatrix f (Rep_matrix A) (Rep_matrix B)) ≠ {}"
+  assume a2: "f 0 0 = 0"
+  have f3: "∀f r. f ` r = {n. ∃p. (p∷nat × nat) ∈ r ∧ (n∷nat) = f p}"
+    by (simp add: Bex_def_raw image_def)
+  have f4: "{n. ∃p. p ∈ {p. combine_infmatrix f (Rep_matrix A) (Rep_matrix B) (fst p) (snd p) ≠ 0} ∧ n = fst p} ≠ {}"
+    using a1 nonzero_positions_def by fastforce
+  have f5: "finite {p. combine_infmatrix f (Rep_matrix A) (Rep_matrix B) (fst p) (snd p) ≠ 0}"
+    using a2 g nonzero_positions_def by force
+  have "∀r f. ¬ finite r ∨ finite {n. ∃p. (p∷nat × nat) ∈ r ∧ (n∷nat) = f p}"
+    using f3 by (metis (no_types) finite_imageI)
+  hence "finite {n. ∃p. p ∈ {p. combine_infmatrix f (Rep_matrix A) (Rep_matrix B) (fst p) (snd p) ≠ 0} ∧ n = fst p}"
+    using f5 by presburger
+  hence "infinite ∈ Collect (op < (Max {n. ∃p. p ∈ {p. combine_infmatrix f (Rep_matrix A) (Rep_matrix B) (fst p) (snd p) ≠ 0} ∧ n = fst p}))"
+    using f4 a2 Max_in c by fastforce
+  thus ?thesis
+    using f3 by (simp add: nonzero_positions_def)
+qed
+
 
 have f:" f 0 0 = 0 ⟹
     (nonzero_positions (combine_infmatrix f (Rep_matrix A) (Rep_matrix B)) ≠ {} ⟶
@@ -1618,9 +1636,11 @@ by (simp add: minus_matrix_def)
 lemma kkk:"(ncols (apply_matrix uminus A)) =ncols A"
 apply(simp add:ncols_def)
 apply auto
-apply (smt kk le0 mem_Collect_eq minus_matrix_def nonzero_positions_def nrows nrows_def)
-apply (smt Collect_empty_eq apply_infmatrix_closed apply_matrix_def bot_set_def mem_Collect_eq nonzero_positions_apply_infmatrix subsetCE)
-by (simp add: nonzero_positions_def)
+apply (simp add: nonzero_positions_def)
+apply (simp add: nonzero_positions_def)
+apply (simp add: nonzero_positions_def)
+done
+
 lemma k:"times_matrix ( minus_matrix A) B  =minus_matrix (times_matrix A B)"
 apply(simp add:times_matrix_def )
 apply(subst Rep_matrix_inject[symmetric])
@@ -1818,7 +1838,9 @@ using mat_add_def q by auto
 lemma mult_exchange:"mat_mult (mat_mult m1 m2) m3=mat_mult m1 (mat_mult m2 m3)"
 by (simp add: d mat_mult_def)
 lemma zero_tr:"Tr zero=0"
-by (smt tr_allo zero_add)
+apply(simp add:Tr_def tr_def)
+done
+
 (*Tr (a-b) =Tr a - Tr b*)
 lemma tr_allo1:"Tr (mat_sub a b) =Tr a -Tr b"
 apply(subgoal_tac "Tr (mat_add a (minus_matrix b)) =Tr a - Tr b ")
@@ -1894,8 +1916,17 @@ have a:"foldseq op + (λk. Rep_matrix (times_matrix a b) k k) (max (nrows (times
   using mat_mult_def max2 mult_ncol by auto
   show " foldseq_transposed op + (λk. Rep_matrix (times_matrix a b) k k) (max (nrows (times_matrix a b)) (ncols (times_matrix a b))) =
     foldseq_transposed op + (λk. Rep_matrix (times_matrix a b) k k) (max (max (max (nrows a) (ncols a)) (nrows b)) (ncols b)) "
-by (smt associative_def foldseq_assoc local.a)
+proof -
+  have "∀f. (∃r ra rb. f (f (r∷real) ra) rb ≠ f r (f ra rb)) ∨ foldseq f = foldseq_transposed f"
+    by (metis (full_types) associative_def foldseq_assoc)
+  then obtain rr :: "(real ⇒ real ⇒ real) ⇒ real" and rra :: "(real ⇒ real ⇒ real) ⇒ real" and rrb :: "(real ⇒ real ⇒ real) ⇒ real" where
+    "∀f. f (f (rr f) (rra f)) (rrb f) ≠ f (rr f) (f (rra f) (rrb f)) ∨ foldseq f = foldseq_transposed f"
+    by metis
+  thus ?thesis
+    using local.a by force
+   qed
 qed
+
 lemma exchange_aux11:" foldseq_transposed op + (λk. Rep_matrix (timematrix a b) k k) (max (nrows (timematrix a b)) (ncols (timematrix a b))) =
 foldseq_transposed op + (λk. Rep_matrix (timematrix a b) k k)  
   (Max (nrows a) (ncols a) (nrows b) (ncols b))"
@@ -1913,12 +1944,20 @@ using eql2 max1 mult_nrow apply auto[1]
 using eql2 max2 mult_ncol by auto
 show " foldseq_transposed op + (λk. Rep_matrix (timematrix a b) k k) (max (nrows (timematrix a b)) (ncols (timematrix a b))) =
     foldseq_transposed op + (λk. Rep_matrix (timematrix a b) k k) (max (max (max (nrows a) (ncols a)) (nrows b)) (ncols b))"
-by (smt associative_def foldseq_assoc local.a)
-qed   
+proof -
+  have "∀f. (∃r ra rb. f (f (r∷real) ra) rb ≠ f r (f ra rb)) ∨ foldseq f = foldseq_transposed f"
+    by (metis (full_types) associative_def foldseq_assoc)
+  then obtain rr :: "(real ⇒ real ⇒ real) ⇒ real" and rra :: "(real ⇒ real ⇒ real) ⇒ real" and rrb :: "(real ⇒ real ⇒ real) ⇒ real" where
+    "∀f. f (f (rr f) (rra f)) (rrb f) ≠ f (rr f) (f (rra f) (rrb f)) ∨ foldseq f = foldseq_transposed f"
+    by metis
+  thus ?thesis
+    using local.a by force
+   qed
+qed  
  lemma exchange_aux2:"mult_matrix_n (max (ncols a) (nrows b)) op * op + a b=
-mult_matrix_n ( (Max (nrows a) (ncols a) (nrows b) (ncols b))) op * op + a b"
-by (smt Matrix.Max_def max.assoc max.cobounded1 max.commute mult_eq_0_iff mult_matrix_n)
-
+              mult_matrix_n ( (Max (nrows a) (ncols a) (nrows b) (ncols b))) op * op + a b"
+        apply(simp add:Max_def)
+        by (simp add: mult_matrix_nm)
 
 lemma exchange_aux4:"
      Rep_matrix
@@ -1974,6 +2013,22 @@ apply(subgoal_tac " (λk. foldseq op + (λka. Rep_matrix b k ka * Rep_matrix a k
 prefer 2
 apply (simp add: associative_def foldseq_assoc)
 by (simp add: exchange_aux6)
+
+lemma exchange_tr_aux15:" foldseq_transposed op + (λk. Rep_matrix (mult_matrix_n (Matrix.Max (nrows a) (ncols a) (nrows b) (ncols b)) op * op + a b) k k)
+     (Matrix.Max (nrows a) (ncols a) (nrows b) (ncols b)) =
+    foldseq_transposed op + (λk. Rep_matrix (mult_matrix_n (Matrix.Max (nrows a) (ncols a) (nrows b) (ncols b)) op * op + b a) k k)
+     (Matrix.Max (nrows a) (ncols a) (nrows b) (ncols b)) ⟹
+ foldseq_transposed op + (λk. Rep_matrix (mult_matrix_n (Matrix.Max (nrows a) (ncols a) (nrows b) (ncols b)) op * op + a b) k k)
+     (Matrix.Max (nrows a) (ncols a) (nrows b) (ncols b)) =
+    foldseq_transposed op + (λk. Rep_matrix (mult_matrix_n (Matrix.Max (nrows b) (ncols b) (nrows a) (ncols a)) op * op + b a) k k)
+     (Matrix.Max (nrows b) (ncols b) (nrows a) (ncols a))"
+     apply(subgoal_tac "(Matrix.Max (nrows b) (ncols b) (nrows a) (ncols a)) =
+           (Matrix.Max (nrows a) (ncols a) (nrows b) (ncols b))")
+     apply auto
+     apply(simp add:Max_def)
+by (simp add: max.commute max.left_commute)
+
+
 (* Tr a*b= Tr b*a *)
 lemma exchange_tr:"Tr (mat_mult a b) =Tr (mat_mult b a)"
 apply(simp add:eql)
@@ -1983,7 +2038,11 @@ apply(simp add:exchange_aux1 )
 apply(simp add:times_matrix_def)
 apply(simp add:mult_matrix_def)
 apply(simp add:exchange_aux2)
-by (smt Matrix.Max_def exchange_aux13 foldseq1_significant_positions max.assoc max.commute)
+apply(rule exchange_tr_aux15)
+using exchange_aux13 by blast
+
+
+
 lemma tr_pow_aux1:"foldseq_transposed op + (λk. Rep_matrix (mat_mult A (dag A)) k k) (max (nrows (mat_mult A (dag A))) (ncols (mat_mult A (dag A))))
 =foldseq op + (λk. Rep_matrix (mat_mult A (dag A)) k k) (max (nrows (mat_mult A (dag A))) (ncols (mat_mult A (dag A))))"
 apply (simp add: associative_def foldseq_assoc)
@@ -2102,11 +2161,11 @@ apply (simp add: dag_dag dag_mult)
 apply (simp add: positive_Tr1)
 done
 (*   a obvious lemma. There are three equivalent definiton of positive matrix *)
-axiomatization where positive_definition : " ∀v. Rep_matrix (mat_mult (mat_mult v A) (dag v)) 0 0≥0⟹positive A"
+axiomatization where positive_definition : "A=dag A⟹ ∀v. Rep_matrix (mat_mult (mat_mult v A) (dag v)) 0 0≥0⟹positive A"
 
 
-lemma posi_decide:"∀v. Rep_matrix (mat_mult (mat_mult v A) (dag v)) 0 0≥0⟹positive A"
-apply(simp add:positive_definition)
+lemma posi_decide:"A=dag A⟹∀v. Rep_matrix (mat_mult (mat_mult v A) (dag v)) 0 0≥0⟹positive A"
+apply(simp add: positive_definition)
 done
 lemma posi_aux1:"∀v. 0 ≤ Rep_matrix (mat_mult v  (dag v)) 0 0"
 apply auto
@@ -2143,6 +2202,7 @@ lemma less6_aux_aux:" Rep_matrix (mat_add a b) 0 0 =
 lemma less6_aux:"∀a.∀b. positive a⟶positive b⟶positive (mat_add a b)"
 apply auto
 apply(rule posi_decide,auto)
+prefer 2
 apply(subgoal_tac " Rep_matrix (mat_mult (mat_mult v (mat_add a b)) (dag v)) 0 0= Rep_matrix (mat_mult (mat_mult v  a) (dag v)) 0 0+ Rep_matrix (mat_mult (mat_mult v  b) (dag v)) 0 0 ")
 prefer 2
 apply(subgoal_tac "mat_mult (mat_mult v (mat_add a b)) (dag v) =
@@ -2161,7 +2221,13 @@ prefer 2
 using posi1 apply blast
 apply(drule_tac x="v"in spec)+
 apply auto
-done
+apply(subgoal_tac "a=dag a")
+prefer 2
+using Matrix.positive_def dag_dag dag_mult apply auto[1]
+apply(subgoal_tac "b=dag b")
+prefer 2
+using Matrix.positive_def dag_dag dag_mult apply auto[1]
+by (simp add: dag_def transpose_matrix_add)
 lemma less6:"∀a.∀b.∀c.∀d. less a b⟶less c d⟶less (mat_add a c) (mat_add b d)"
 apply(simp add:less_def)
 apply(auto)
@@ -2282,8 +2348,9 @@ apply(subgoal_tac " 0 ≤ Rep_matrix (mat_mult (mat_mult v  m ) (mat_mult (dag m
 apply (simp add: mult_exchange)
 by (metis dag_mult posi_aux)
 
-lemma eq:"positive A≡∀v. Rep_matrix (mat_mult (mat_mult v A) (dag v)) 0 0≥0"
-by (smt posi posi_decide)
+lemma eq:"positive A≡(A=dag A) ∧ (∀v. Rep_matrix (mat_mult (mat_mult v A) (dag v)) 0 0≥0)"
+by (smt Matrix.positive_def dag_dag dag_mult posi1 positive_definition)
+
 lemma less20:"less a b⟹less (mat_mult (mat_mult (dag c) a) c) (mat_mult (mat_mult (dag c) b) c)"
 apply(simp add:less_def)
 by (metis dag_dag less3_aux mult_sub_allo1 mult_sub_allo2)
@@ -2357,6 +2424,7 @@ apply auto
 done
 lemma Cau_Sch_aux5:"(a::real)*a+(b::real)*b≥ 2* a* b"
 by (smt power2_eq_square sum_squares_bound)
+
 lemma Cau_Sch_aux55:"(a::real)*a+(b::real)*b≥ 2* abs(a)* abs(b)"
 by (metis Cau_Sch_aux5 abs_mult_self)
 
