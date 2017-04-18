@@ -503,7 +503,21 @@ lemma aux1:"∀i j. convergent (λn. Rep_matrix (A n) i j) ⟹∀n v. Rep_matrix
    (*positive (A n) ⟹ positive lim (A n)*)
 lemma aux:"∀i j. convergent (λn. Rep_matrix (A n) i j) ⟹∀n. positive (A n) ⟹positive (Abs_matrix (λi j. (lim (λ n. (Rep_matrix (A n) i j))) ))"
 apply(rule posi_decide)
-by (simp add: posi aux1)
+prefer 2
+apply (simp add: posi aux1)
+apply(simp add:dag_def transpose_matrix_def)
+apply(subgoal_tac "(λi j. lim (λn. Rep_matrix (A n) i j)) =(transpose_infmatrix (Rep_matrix (Abs_matrix (λi j. lim (λn. Rep_matrix (A n) i j)))))")
+apply simp
+apply(rule ext)+
+apply(simp add:transpose_infmatrix_def)
+apply(subgoal_tac " Rep_matrix (Abs_matrix (λi j. lim (λn. Rep_matrix (A n) i j))) j i =
+        (λi j. lim (λn. Rep_matrix (A n) i j)) j i ")
+prefer 2
+apply (simp add: aux6)
+apply auto
+apply(subgoal_tac "  (λn. Rep_matrix (A n) i j) =  (λn. Rep_matrix (A n) j i) ")
+apply simp
+by (metis eq tr_pow_aux3)
 lemma aux_advance:" ∀n. positive (A n) ⟹∃B.∀n. Tr (A n) ≤B ⟹ ∀n. less (A n) (A (Suc n)) 
                ⟹positive (Abs_matrix (λi j. (lim (λ n. (Rep_matrix (A n) i j))) ))"
 apply(rule aux,auto)
