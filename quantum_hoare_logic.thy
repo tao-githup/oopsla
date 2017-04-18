@@ -48,9 +48,17 @@ fun rank :: "com⇒nat" where
 "rank (Cond mcl) =  (case mcl of [] ⇒ 1
   | mc # mcr ⇒ 1+rank (fst (snd mc)) + rank (Cond mcr)) "|
 "rank  (While  m0 m1 s Q )= 1+rank(s)"
+
+lemma rank_pos_aux:" (⋀a aa b.
+             (a, aa, b) ∈ set x⟹ 0 < rank aa) ⟹
+         0 < (case x of [] ⇒ 1 | mc # mcr ⇒ 1 + rank (fst (snd mc)) + rank (Cond mcr))"
+     apply(induct x,auto)
+     done
+
 lemma rank_pos : " rank ss > 0" 
 apply (induct ss, auto) 
-by (smt One_nat_def Suc_less_eq le_imp_less_Suc list.case(1) list.case(2) list.exhaust monoid_add_class.add.left_neutral monoid_add_class.add.right_neutral not_le order_refl plus_nat.simps(2) rank.simps(5) trans_le_add1 trans_le_add2)
+by (metis fst_eqD fsts.intros rank_pos_aux snd_eqD snds.intros)
+
 primrec wh_n::"(Mat⇒Mat) ⇒Mat⇒Mat⇒nat⇒Mat"where
 "wh_n ff m1 p 0=p"|
 "wh_n ff m1 p (Suc n) =ff (mat_mult (mat_mult m1 (wh_n ff m1 p n)) (dag m1))"
@@ -697,7 +705,11 @@ lemma bb_aux4:"wellDefined s⟹∀p. positive p⟶Tr (denoFun s p) ≤Tr p"
       apply auto
       apply(induct s,auto)
       apply (simp add: m_init)
-      apply (smt Ident UMat_def exchange_tr mult_exchange)
+      apply(simp add:exchange_tr )
+      apply(subgoal_tac " Tr (mat_mult (mat_mult (dag x1) x1) p) ≤ Tr p")
+      apply(simp add:mult_exchange)
+      apply(simp add:UMat_def)
+      apply (simp add: Ident)
       apply(subgoal_tac "positive (denoFun s1 p)")
       prefer 2
       apply (simp add: quantum_hoare_logic.b)
@@ -798,7 +810,7 @@ done
 lemma mea1:"validlist M Q ⟹ ∀ρ. positive ρ ⟶
         Tr (mat_mult (sum1 M) ρ) ≤ Tr (mat_mult Q (denoFun (Cond M) ρ)) + Tr (mat_mult (M_sum M) ρ) - Tr (denoFun (Cond M) ρ)"
 apply(induct M,auto)
-apply (smt I_zero less4 rho_zero zero_mult_l zero_mult_r zero_tr)
+apply(simp add:zero_tr zero_mult_r)
 apply(simp add:mult_allo1)
 apply(simp add:tr_allo)
 apply(simp add:mult_allo2)
