@@ -3237,7 +3237,7 @@ lemma positive_definition_aux38:" infinite>0⟹foldseq_transposed op +
                     apply(subgoal_tac "Rep_matrix (extend_matrix v) 0 0 =0")
 using mult_not_zero apply blast
 using Rep_extend_matrix by presburger
-lemma fuck:"(a::real)=0⟹c=a+b⟹c=b"
+lemma simple:"(a::real)=0⟹c=a+b⟹c=b"
 apply auto
 done
 lemma positive_definition_aux40:" infinite>0⟹foldseq_transposed op +
@@ -3252,7 +3252,7 @@ apply(cut_tac a="(foldseq_transposed op + (λka. Rep_matrix (extend_matrix v) 0 
                     Rep_matrix (extend_matrix v) 0 (Suc k))  (infinite-1)" and c="foldseq_transposed op +
                (λk. foldseq_transposed op + (λka. Rep_matrix (extend_matrix v) 0 ka * Rep_matrix A ka k) infinite *
                     Rep_matrix (extend_matrix v) 0 k)
-               infinite" in fuck)
+               infinite" in simple)
 using positive_definition_aux39 apply blast
 using positive_definition_aux38 apply blast
 by blast
@@ -3303,7 +3303,7 @@ using Rep_extend_matrix by presburger
 lemma mid2:"infinite>0⟹foldseq_transposed op + (λka. Rep_matrix (extend_matrix v) 0 ka * Rep_matrix A ka (Suc k)) infinite =
 foldseq_transposed op + (λka. Rep_matrix (extend_matrix v) 0 (Suc ka) * Rep_matrix A (Suc ka) (Suc k)) (infinite-1)"
 apply(cut_tac a="Rep_matrix (extend_matrix v) 0 0 * Rep_matrix A 0 (Suc k) " and b="foldseq_transposed op + (λka. Rep_matrix (extend_matrix v) 0 (Suc ka) * Rep_matrix A (Suc ka) (Suc k)) (infinite-1)" and
-      c="foldseq_transposed op + (λka. Rep_matrix (extend_matrix v) 0 ka * Rep_matrix A ka (Suc k)) infinite" in fuck)
+      c="foldseq_transposed op + (λka. Rep_matrix (extend_matrix v) 0 ka * Rep_matrix A ka (Suc k)) infinite" in simple)
 using mid1 apply blast
 using mid apply blast
 apply blast
@@ -3552,7 +3552,7 @@ lemma mid35:" infinite>0⟹x>0⟹ foldseq_transposed op + (λk. Rep_matrix (exte
   apply(cut_tac a=" (Rep_matrix (extend_matrix1 m) x 0 *
             Rep_matrix (extend_matrix1 m) (Suc xa) 0)" and b=" foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x (Suc k) *
             Rep_matrix (extend_matrix1 m) (Suc xa) (Suc k)) (infinite-1)" and c=" foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x k *
-            Rep_matrix (extend_matrix1 m) (Suc xa) k) infinite" in fuck)
+            Rep_matrix (extend_matrix1 m) (Suc xa) k) infinite" in simple)
 using mid34 apply blast      
 using mid33 apply blast
 by blast
@@ -3562,7 +3562,7 @@ apply(induct n,auto)
 done
 
 
-lemma fuck2:"( i<infinite-1⟹x < infinite ⟹
+lemma simple2:"( i<infinite-1⟹x < infinite ⟹
     0 < infinite ⟹
     i≤infinite⟹
     x>0⟹nrows m < infinite ⟹
@@ -3588,7 +3588,7 @@ lemma fuck2:"( i<infinite-1⟹x < infinite ⟹
        Rep_matrix (extend_matrix1 m) x (Suc i) * Rep_matrix (extend_matrix1 m) (Suc xa) (Suc i)"
 using nat_neq_iff by blast
 
-lemma fuck3:"(y<infinite-1⟹ i < infinite - 1 ⟹
+lemma simple3:"(y<infinite-1⟹ i < infinite - 1 ⟹
     0 < infinite ⟹
     nrows m < infinite ⟹
     Rep_matrix m y i = Rep_matrix (extend_matrix1 m) (Suc y) (Suc i)) ⟹
@@ -3609,11 +3609,11 @@ lemma fuck3:"(y<infinite-1⟹ i < infinite - 1 ⟹
     Rep_matrix m y i = Rep_matrix (extend_matrix1 m) (Suc y) (Suc i)"
 using linorder_neqE_nat by blast
 
-lemma sb2:"   i < infinite - 1 ⟹
+lemma obvs2:"   i < infinite - 1 ⟹
     0 < infinite ⟹
     nrows m < infinite ⟹
     Rep_matrix m y i = Rep_matrix (extend_matrix1 m) (Suc y) (Suc i)"
-apply(rule fuck3)
+apply(rule simple3)
 apply (metis Rep_extend_matrix1 Suc_diff_1 Suc_mono diff_Suc_1 nat.distinct(1))
 apply(subgoal_tac " Rep_matrix m y i =0")
 prefer 2
@@ -3630,7 +3630,7 @@ done
     x>0⟹nrows m < infinite ⟹ ncols m≤nrows m⟹
        Rep_matrix m (x - 1) i * Rep_matrix m xa i =
        Rep_matrix (extend_matrix1 m) x (Suc i) * Rep_matrix (extend_matrix1 m) (Suc xa) (Suc i)"
-      apply(rule fuck2)
+      apply(rule simple2)
       prefer 4
       apply blast
       prefer 4
@@ -3646,7 +3646,7 @@ done
 apply (metis Rep_extend_matrix1 Suc_diff_1 Suc_mono diff_Suc_1 nat.distinct(1))
 apply(subgoal_tac " Rep_matrix m xa i =  Rep_matrix (extend_matrix1 m) (Suc xa) (Suc i)")
 apply presburger
-using sb2 apply blast
+using obvs2 apply blast
 prefer 2
 apply(subgoal_tac "i=infinite")
 prefer 2
@@ -3705,7 +3705,7 @@ lemma mid27_aux_aux1:"x<infinite⟹infinite>0⟹foldseq_transposed op + (λk. Re
             apply(subgoal_tac " foldseq_transposed op + (λk. Rep_matrix m (x - 1) k * Rep_matrix m xa k) infinite=
                foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x (Suc k) *
                 Rep_matrix (extend_matrix1 m) (Suc xa) (Suc k)) (infinite-1)")
-using fuck mid33 mid34 apply presburger
+using simple mid33 mid34 apply presburger
 apply(subgoal_tac "foldseq_transposed op + (λk. Rep_matrix m (x - 1) k * Rep_matrix m xa k) infinite =
    foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x (Suc k) * Rep_matrix (extend_matrix1 m) (Suc xa) (Suc k)) infinite")
 using mid80 apply presburger  
@@ -3729,7 +3729,7 @@ prefer 2
 apply linarith
 by (metis (no_types, lifting) Suc_leI finite_nonzero_positions less_imp_not_less less_le_trans mult_not_zero nrows_def nrows_notzero)
 
-  lemma fuck1:"(x<infinite⟹infinite>0⟹foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x k * Rep_matrix (extend_matrix1 m) xa k) infinite =
+  lemma simple1:"(x<infinite⟹infinite>0⟹foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x k * Rep_matrix (extend_matrix1 m) xa k) infinite =
           Rep_matrix A x xa ⟹
           0 < x ⟹
           ∀i. Rep_matrix A 0 i = 0 ⟹
@@ -3760,7 +3760,7 @@ lemma mid27_aux0:"infinite>0⟹foldseq_transposed op + (λk. Rep_matrix (extend_
           (λj i. foldseq_transposed op + (λk. Rep_matrix m j k * Rep_matrix m i k) infinite) = (λi j. Rep_matrix A (Suc i) (Suc j)) ⟹
           foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x k * Rep_matrix (extend_matrix1 m) (Suc xa) k) infinite =
           Rep_matrix A x (Suc xa)"
-          apply(rule fuck1)
+          apply(rule simple1)
         
 using mid27_aux_aux1 apply blast
 using mid27_aux_aux apply presburger
@@ -3789,7 +3789,7 @@ lemma mid27_aux:"foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x k
     
 using mid27_aux0 mid27_aux1 by blast
 
-lemma sb:"0 < x ⟹
+lemma obvs:"0 < x ⟹
     ∀i. Rep_matrix A 0 i = 0 ⟹
     nrows m < infinite ⟹
     ∀i. Rep_matrix A i 0 = 0 ⟹
@@ -3815,7 +3815,7 @@ lemma mid27:"      x>0⟹      ∀i. Rep_matrix A 0 i = 0 ⟹nrows m<infinite⟹
            apply(subgoal_tac "foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x k * Rep_matrix (extend_matrix1 m) 0 k) infinite =0")
             apply linarith
             apply(rule mid14_aux)
-using sb apply blast
+using obvs apply blast
 apply(subgoal_tac " foldseq_transposed op + (λk. Rep_matrix (extend_matrix1 m) x k * Rep_matrix (extend_matrix1 m) xa k) infinite =
            Rep_matrix A x xa")
 prefer 2
@@ -4031,7 +4031,7 @@ by (meson not_less py4_aux py4_aux1)
 
 
 
-lemma py_sb1:" A=dag A⟹0 < Rep_matrix A 0 0 ⟹
+lemma py_obvs1:" A=dag A⟹0 < Rep_matrix A 0 0 ⟹
               nrows A ≤ j ⟹
               Rep_matrix A ia i ≠ 0 ⟹ Rep_matrix (row_switch A) j ia = 0"
 apply(subgoal_tac "ia<nrows A")
@@ -4056,7 +4056,7 @@ by (metis Rep_row_switch neq_iff)
 
 
 
-lemma py_sb:" A=dag A⟹0 < Rep_matrix A 0 0 ⟹ nrows (mat_mult (row_switch A) A) ≤ nrows A"
+lemma py_obvs:" A=dag A⟹0 < Rep_matrix A 0 0 ⟹ nrows (mat_mult (row_switch A) A) ≤ nrows A"
 apply(subst nrows_le,auto)
 apply(simp add:mat_mult_eql)
 apply(simp add:mat_mult2_def)
@@ -4065,9 +4065,9 @@ apply(subgoal_tac "Rep_matrix (Abs_matrix (λj i. foldseq_transposed op + (λk. 
 prefer 2
 apply (simp add: positive_definition_aux33)
 apply(rule mid14_aux,auto)
-apply(rule py_sb1,auto)
+apply(rule py_obvs1,auto)
 done
-lemma py_fuck:" Rep_matrix
+lemma py_simple:" Rep_matrix
                 (Abs_matrix
                   (λj i. foldseq_transposed op +
                           (λk. foldseq_transposed op + (λka. Rep_matrix (row_switch A) j ka * Rep_matrix A ka k) infinite *
@@ -4088,14 +4088,14 @@ apply (metis (full_types) Suc_leI finite_nonzero_positions le0 ncols_def ncols_l
 by (metis Suc_leI finite_nonzero_positions le0 ncols_def ncols_le)
 
 
-lemma py_fuck4:"i≥infinite⟹A = dag A ⟹infinite>0⟹
+lemma py_simple4:"i≥infinite⟹A = dag A ⟹infinite>0⟹
     0 < nrows A ⟹
     0 < Rep_matrix A 0 0 ⟹
     0 < i ⟹
     foldseq_transposed op + (λka. Rep_matrix (row_switch A) i ka * Rep_matrix A ka 0) infinite = 0"
     apply(rule mid14_aux)
 by (metis mult_eq_0_iff nrows_le nrows_max)
- lemma py_fuck5:"i<infinite⟹A = dag A ⟹infinite>0⟹
+ lemma py_simple5:"i<infinite⟹A = dag A ⟹infinite>0⟹
     0 < nrows A ⟹
     0 < Rep_matrix A 0 0 ⟹
     0 < i ⟹
@@ -4132,14 +4132,14 @@ prefer 2
 apply (metis neq_iff obv1)
 by (smt eq_divide_eq mult_cancel_right1)
       
-lemma py_fuck3:"
+lemma py_simple3:"
              A = dag A ⟹
              0 < nrows A ⟹
              0 < Rep_matrix A 0 0 ⟹
              0 < i ⟹ Rep_matrix (mat_mult2 (mat_mult2 (row_switch A) A) (dag (row_switch A))) i 0 = 0"
      unfolding mat_mult2_def   
     apply(simp add:positive_definition_aux33)
-    apply(simp add:py_fuck)
+    apply(simp add:py_simple)
     apply(subgoal_tac " ( foldseq_transposed op + (λka. Rep_matrix (row_switch A) i ka *
                     Rep_matrix A ka 0) infinite * Rep_matrix (dag (row_switch A)) 0 0)= foldseq_transposed op +
             (λk. foldseq_transposed op + (λka. Rep_matrix (row_switch A) i ka * Rep_matrix A ka k) infinite *
@@ -4161,14 +4161,14 @@ proof -
   assume a4: "0 < nrows A"
   assume a5: "0 < Rep_matrix A 0 0"
   hence f6: "¬ infinite ≤ i ∨ foldseq_transposed op + (λn. Rep_matrix (row_switch A) i n * Rep_matrix A n 0) infinite = 0"
-    using a4 a3 a2 a1 py_fuck4 by blast
+    using a4 a3 a2 a1 py_simple4 by blast
   have "¬ i < infinite ∨ foldseq_transposed op + (λn. Rep_matrix (row_switch A) i n * Rep_matrix A n 0) infinite = 0"
-    using a5 a4 a3 a2 a1 py_fuck5 by blast
+    using a5 a4 a3 a2 a1 py_simple5 by blast
   thus "foldseq_transposed op + (λn. Rep_matrix (row_switch A) i n * Rep_matrix A n 0) infinite = 0"
     using f6 not_less by blast
 qed
 
-lemma py_fuck3_dual_aux:" i≥infinite⟹A = transpose_matrix A ⟹
+lemma py_simple3_dual_aux:" i≥infinite⟹A = transpose_matrix A ⟹
     0 < nrows A ⟹
     0 < Rep_matrix A 0 0 ⟹
     0 < i ⟹
@@ -4180,7 +4180,7 @@ lemma py_fuck3_dual_aux:" i≥infinite⟹A = transpose_matrix A ⟹
 using nrows_le nrows_max by blast
 
     
-    lemma py_fuck3_dual_aux4:" i < infinite ⟹
+    lemma py_simple3_dual_aux4:" i < infinite ⟹
     A = transpose_matrix A ⟹
     0 < nrows A ⟹
     0 < Rep_matrix A 0 0 ⟹
@@ -4235,7 +4235,7 @@ prefer 2
 apply blast
 by (smt mult_cancel_right1 nonzero_mult_divide_cancel_left times_divide_eq_right transpose_matrix)
  
-    lemma py_fuck3_dual_aux1:" i<infinite⟹A = transpose_matrix A ⟹
+    lemma py_simple3_dual_aux1:" i<infinite⟹A = transpose_matrix A ⟹
     0 < nrows A ⟹
     0 < Rep_matrix A 0 0 ⟹
     0 < i ⟹
@@ -4287,16 +4287,16 @@ apply(subgoal_tac "foldseq_transposed op + (λka. Rep_matrix (row_switch A) 0 ka
        Rep_matrix (row_switch A) 0 0 * Rep_matrix A 0 i  ")
 prefer 2
 apply linarith
-using py_fuck3_dual_aux4 by blast
+using py_simple3_dual_aux4 by blast
 
-lemma py_fuck3_dual:"
+lemma py_simple3_dual:"
              A = dag A ⟹
              0 < nrows A ⟹
              0 < Rep_matrix A 0 0 ⟹
              0 < i ⟹ Rep_matrix (mat_mult2 (mat_mult2 (row_switch A) A) (dag (row_switch A))) 0 i = 0"
  unfolding mat_mult2_def   
     apply(simp add:positive_definition_aux33)
-     apply(simp add:py_fuck)
+     apply(simp add:py_simple)
      apply(simp add:dag_def)
 proof -
   assume a1: "0 < i"
@@ -4304,28 +4304,28 @@ proof -
   assume a3: "0 < nrows A"
   assume a4: "0 < Rep_matrix A 0 0"
   hence f5: "¬ i < infinite ∨ foldseq_transposed op + (λn. foldseq_transposed op + (λna. Rep_matrix (row_switch A) 0 na * Rep_matrix A na n) infinite * Rep_matrix (row_switch A) i n) infinite = 0"
-    using a3 a2 a1 py_fuck3_dual_aux1 by blast
+    using a3 a2 a1 py_simple3_dual_aux1 by blast
   have "¬ infinite ≤ i ∨ foldseq_transposed op + (λn. foldseq_transposed op + (λna. Rep_matrix (row_switch A) 0 na * Rep_matrix A na n) infinite * Rep_matrix (row_switch A) i n) infinite = 0"
-    using a4 a3 a2 a1 py_fuck3_dual_aux by blast
+    using a4 a3 a2 a1 py_simple3_dual_aux by blast
   thus "foldseq_transposed op + (λn. foldseq_transposed op + (λna. Rep_matrix (row_switch A) 0 na * Rep_matrix A na n) infinite * Rep_matrix (row_switch A) i n) infinite = 0"
     using f5 not_less by blast
 qed
   
 
            
-lemma py_fuck1:"
+lemma py_simple1:"
              A = dag A ⟹
              0 < nrows A ⟹
              0 < Rep_matrix A 0 0 ⟹
              0 < i ⟹ Rep_matrix (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A))) i 0 = 0"
-by (metis mat_mult_eql  py_fuck3)
+by (metis mat_mult_eql  py_simple3)
 
-lemma py_fuck1_dual:"
+lemma py_simple1_dual:"
              A = dag A ⟹
              0 < nrows A ⟹
              0 < Rep_matrix A 0 0 ⟹
              0 < i ⟹ Rep_matrix (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A))) 0 i = 0"
-by (simp add: mat_mult_eql py_fuck3_dual)
+by (simp add: mat_mult_eql py_simple3_dual)
 
 lemma cms_aux1:" Rep_matrix
              (Abs_matrix
@@ -4777,7 +4777,7 @@ apply linarith
 apply (meson dual_order.strict_trans2 le0 obv9)
 apply(subgoal_tac " foldseq_transposed op + (λk. Rep_matrix (extend_matrix2 (Rep_matrix A 0 0) m) x (Suc k) *
                Rep_matrix (extend_matrix2 (Rep_matrix A 0 0) m) xa (Suc k)) (infinite-1) =Rep_matrix A x xa")
-apply (metis fuck mult_zero_left)
+apply (metis simple mult_zero_left)
 apply(subgoal_tac " foldseq_transposed op +
      (λk. Rep_matrix (extend_matrix2 (Rep_matrix A 0 0) m) x (Suc k) * Rep_matrix (extend_matrix2 (Rep_matrix A 0 0) m) xa (Suc k))
      (infinite - 1) =
@@ -5030,7 +5030,7 @@ apply(subgoal_tac " nrows (mat_mult (mat_mult (row_switch A) A) (dag (row_switch
 using py4 apply blast
 apply(subgoal_tac " nrows (mat_mult (row_switch A) A)  ≤nrows A ")
 using dual_order.trans mult_nrow apply blast
-apply(simp add:py_sb)
+apply(simp add:py_obvs)
 apply(subgoal_tac " ∀v. 0 ≤ Rep_matrix (mat_mult (mat_mult v (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A)))) (dag v)) 0 0")
 prefer 2
 apply auto
@@ -5043,7 +5043,7 @@ prefer 2
 apply(simp add:mat_mult_eql )
 apply(simp(no_asm) add: mat_mult2_def)
 apply(simp add:positive_definition_aux33)
-apply(simp add:py_fuck )
+apply(simp add:py_simple )
 apply(simp(no_asm) add:dag_def)
 apply(subgoal_tac "infinite>0")
 prefer 2
@@ -5074,11 +5074,11 @@ apply (metis mult_cancel_right1)
 apply(subgoal_tac "∀i. i>0⟶Rep_matrix (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A))) i 0=0")
 prefer 2
 apply auto
-using py_fuck1 apply blast
+using py_simple1 apply blast
 apply(subgoal_tac "∀i. i>0⟶Rep_matrix (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A))) 0 i=0")
 prefer 2
 apply auto
-using py_fuck1_dual apply blast
+using py_simple1_dual apply blast
 apply(subgoal_tac "nrows (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A))) >0")
 prefer 2
 apply (metis neq_iff nrows_notzero)
@@ -5087,7 +5087,7 @@ prefer 2
 apply (simp add: dag_dag dag_mult mult_exchange)
 apply(subgoal_tac "nrows (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A))) ≤nrows A")
 prefer 2
-apply (meson dual_order.trans mult_nrow py_sb)
+apply (meson dual_order.trans mult_nrow py_obvs)
 apply(subgoal_tac "nrows (mat_mult (mat_mult (row_switch A) A) (dag (row_switch A))) ≤Suc n")
 prefer 2
 apply linarith
@@ -5190,7 +5190,8 @@ apply(simp add:less_def)
 apply(subgoal_tac "positive I")
 apply (simp add:zero_sub)
 apply(simp add:positive_def)
-by (metis Ident dag_I dag_def nrows_transpose)
+by (metis Ident dag_I dag_def nrows_transpose order_refl)
+
 (*a≥a*)
 lemma less11:" less a a"
 apply(simp add:less_def)
@@ -5244,8 +5245,14 @@ lemma less1:"less a b⟹less (mat_add c a) (mat_add c b )"
 apply (simp add:less10)
 done
 lemma less3_aux:"positive A⟹positive (mat_mult (mat_mult B A) (dag B)) "
+apply(rule positive_definition)
 apply(simp add:positive_def)
-by (metis dag_mult mult_exchange)
+apply auto
+apply (simp add: dag_dag dag_mult mult_exchange)
+apply(simp add:positive_def)
+apply auto
+by (metis dag_mult mult_exchange posi_aux1)
+
 (* a≥0⟹m*a*m.T≥0  *)
 lemma less3:" less zero  a⟹less zero (mat_mult (mat_mult b a) (dag b))"
 apply(subgoal_tac "positive (mat_mult (mat_mult b a) (dag b))")
